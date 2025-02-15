@@ -96,12 +96,12 @@ export function NavBar() {
 
   return (
     <div className={styles.navbar}>
-      <div className={styles.logo}>
+      <Link className={styles.logo} href={links[0].url}>
         <Icon size="lg">
           <Icons.Logo />
         </Icon>
         <Text>umami</Text>
-      </div>
+      </Link>
       <div className={styles.links}>
         {links.map(({ url, label }) => {
           return (
