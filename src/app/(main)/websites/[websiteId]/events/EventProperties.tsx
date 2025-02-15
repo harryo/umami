@@ -2,9 +2,10 @@ import { GridColumn, GridTable } from 'react-basics';
 import { useEventDataProperties, useEventDataValues, useMessages } from '@/components/hooks';
 import { LoadingPanel } from '@/components/common/LoadingPanel';
 import PieChart from '@/components/charts/PieChart';
+import Chart from '@/components/charts/Chart';
 import { useState } from 'react';
-import { CHART_COLORS } from '@/lib/constants';
 import styles from './EventProperties.module.css';
+import getChartData from './getChartData';
 
 export function EventProperties({ websiteId }: { websiteId: string }) {
   const [propertyName, setPropertyName] = useState('');
@@ -12,19 +13,7 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
   const { formatMessage, labels } = useMessages();
   const { data, isLoading, isFetched, error } = useEventDataProperties(websiteId);
   const { data: values } = useEventDataValues(websiteId, eventName, propertyName);
-  const chartData =
-    propertyName && values
-      ? {
-          labels: values.map(({ value }) => value),
-          datasets: [
-            {
-              data: values.map(({ total }) => total),
-              backgroundColor: CHART_COLORS,
-              borderWidth: 0,
-            },
-          ],
-        }
-      : null;
+  const chartData = propertyName && values ? getChartData(values) : null;
 
   const handleRowClick = row => {
     setEventName(row.eventName);
@@ -54,7 +43,11 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
         {propertyName && (
           <div className={styles.chart}>
             <div className={styles.title}>{propertyName}</div>
-            <PieChart key={propertyName + eventName} type="doughnut" data={chartData} />
+            {chartData?.type === 'line' ? (
+              <Chart key={propertyName + eventName} {...chartData} />
+            ) : (
+              <PieChart key={propertyName + eventName} {...chartData} />
+            )}
           </div>
         )}
       </div>
