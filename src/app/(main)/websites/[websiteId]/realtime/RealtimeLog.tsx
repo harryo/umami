@@ -121,8 +121,9 @@ export function RealtimeLog({ data }: { data: RealtimeData }) {
 
   const Row = ({ index, style }) => {
     const row = logs[index];
+    const key = index + '|' + row.createdAt;
     return (
-      <div className={styles.row} style={style}>
+      <div key={key} className={styles.row} style={style}>
         <div>
           <StatusLight color={getColor(row)} />
         </div>
