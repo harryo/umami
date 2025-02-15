@@ -57,8 +57,10 @@ function getPieChartData(values: { value: string; total: number }[]): ChartProps
 function getLineChartData(values: { value: number; total: number }[]): ChartProps {
   const sortedValues = quickSort(values);
   const list = [];
+  let sum = 0;
   sortedValues.forEach(({ value, total }) => {
     list.push(...Array(total).fill(value));
+    sum += total * value;
   });
   const count = list.length;
   const median = list[Math.floor(count / 2)];
@@ -96,16 +98,10 @@ function getLineChartData(values: { value: number; total: number }[]): ChartProp
           type: 'linear',
           title: {
             display: true,
-            text: 'Value',
+            text: `Total = ${sum.toLocaleString()}`,
           },
           min: 0,
           max,
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'Total',
-          },
         },
       },
     },
