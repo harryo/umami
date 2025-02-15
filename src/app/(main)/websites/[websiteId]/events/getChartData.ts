@@ -21,7 +21,7 @@ function numericValues(values: { value: string; total: number }[]) {
     : null;
 }
 
-function quickSort(list: number[]) {
+function quickSort(list: { value: number }[]) {
   if (list.length < 2) {
     return list;
   }
@@ -29,7 +29,7 @@ function quickSort(list: number[]) {
   const left = [];
   const right = [];
   for (let i = 1; i < list.length; i++) {
-    if (list[i] <= pivot) {
+    if (list[i].value <= pivot.value) {
       left.push(list[i]);
     } else {
       right.push(list[i]);
@@ -55,13 +55,13 @@ function getPieChartData(values: { value: string; total: number }[]): ChartProps
 }
 
 function getLineChartData(values: { value: number; total: number }[]): ChartProps {
+  const sortedValues = quickSort(values);
   const list = [];
-  values.forEach(({ value, total }) => {
+  sortedValues.forEach(({ value, total }) => {
     list.push(...Array(total).fill(value));
   });
-  const sortedList = quickSort(list);
-  const count = sortedList.length;
-  const median = sortedList[Math.floor(count / 2)];
+  const count = list.length;
+  const median = list[Math.floor(count / 2)];
   const numRanges = 12;
   const rangeCount = Array(numRanges).fill(0);
   const max = median * 4;
@@ -69,7 +69,7 @@ function getLineChartData(values: { value: number; total: number }[]): ChartProp
   let rangeIndex = 0;
   let lastIndex = 0;
   let nextLimit = stepSize;
-  sortedList.forEach((value: number, index: number) => {
+  list.forEach((value: number, index: number) => {
     while (value > nextLimit && rangeIndex < numRanges) {
       rangeCount[rangeIndex++] += index - lastIndex;
       lastIndex = index;
