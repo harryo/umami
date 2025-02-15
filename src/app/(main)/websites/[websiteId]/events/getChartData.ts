@@ -21,6 +21,23 @@ function numericValues(values: { value: string; total: number }[]) {
     : null;
 }
 
+function quickSort(list: number[]) {
+  if (list.length < 2) {
+    return list;
+  }
+  const pivot = list[0];
+  const left = [];
+  const right = [];
+  for (let i = 1; i < list.length; i++) {
+    if (list[i] <= pivot) {
+      left.push(list[i]);
+    } else {
+      right.push(list[i]);
+    }
+  }
+  return [...quickSort(left), pivot, ...quickSort(right)];
+}
+
 function getPieChartData(values: { value: string; total: number }[]): ChartProps {
   return {
     type: 'pie',
@@ -38,21 +55,27 @@ function getPieChartData(values: { value: string; total: number }[]): ChartProps
 }
 
 function getLineChartData(values: { value: number; total: number }[]): ChartProps {
-  let sum = 0;
-  let count = 0;
+  const list = [];
   values.forEach(({ value, total }) => {
-    count += total;
-    sum += value * total;
+    list.push(...Array(total).fill(value));
   });
-  const mean = sum / count;
-  const numRanges = 15;
+  const sortedList = quickSort(list);
+  const count = sortedList.length;
+  const median = sortedList[Math.floor(count / 2)];
+  const numRanges = 12;
   const rangeCount = Array(numRanges).fill(0);
-  const stepSize = mean / 5;
-  values.forEach(({ value, total }) => {
-    const index = Math.floor(Math.min(value / stepSize, numRanges - 1));
-    rangeCount[index] += total;
+  const max = median * 4;
+  const stepSize = max / numRanges;
+  let rangeIndex = 0;
+  let lastIndex = 0;
+  let nextLimit = stepSize;
+  sortedList.forEach((value: number, index: number) => {
+    while (value > nextLimit && rangeIndex < numRanges) {
+      rangeCount[rangeIndex++] += index - lastIndex;
+      lastIndex = index;
+      nextLimit += stepSize;
+    }
   });
-
   return {
     type: 'line',
     data: {
@@ -76,7 +99,7 @@ function getLineChartData(values: { value: number; total: number }[]): ChartProp
             text: 'Value',
           },
           min: 0,
-          max: mean * 3,
+          max,
         },
         y: {
           title: {
