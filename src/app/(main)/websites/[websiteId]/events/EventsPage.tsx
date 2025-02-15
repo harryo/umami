@@ -11,7 +11,7 @@ import { useState } from 'react';
 import EventProperties from './EventProperties';
 
 export default function EventsPage({ websiteId }) {
-  const [tab, setTab] = useState('activity');
+  const [tab, setTab] = useState('properties');
   const { formatMessage, labels } = useMessages();
 
   return (
@@ -33,8 +33,8 @@ export default function EventsPage({ websiteId }) {
           onSelect={(value: any) => setTab(value)}
           style={{ marginBottom: 30 }}
         >
-          <Item key="activity">{formatMessage(labels.activity)}</Item>
           <Item key="properties">{formatMessage(labels.properties)}</Item>
+          <Item key="activity">{formatMessage(labels.activity)}</Item>
         </Tabs>
         {tab === 'activity' && <EventsDataTable websiteId={websiteId} />}
         {tab === 'properties' && <EventProperties websiteId={websiteId} />}
