@@ -17,7 +17,7 @@
     "start-docker": "npm-run-all check-db update-tracker start-server",
     "start-env": "node scripts/start-env.js",
     "start-server": "node server.js",
-    "build-app": "next build",
+    "build-app": "NODE_OPTIONS=\"--max-old-space-size=1024\" next build",
     "build-components": "rollup -c rollup.components.config.mjs",
     "build-tracker": "rollup -c rollup.tracker.config.mjs",
     "build-db": "npm-run-all copy-db-files build-db-client",
