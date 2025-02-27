@@ -63,9 +63,14 @@ async function relationalQuery(
     `;
   }
 
+  const altColumn =
+    column === 'referrer_domain' && 'referrer' in filters
+      ? 'CONCAT(referrer_domain, referrer_path)'
+      : column;
+
   return rawQuery(
     `
-    select ${column} x,
+    select ${altColumn} x,
       ${column === 'referrer_domain' ? 'count(distinct website_event.session_id)' : 'count(*)'} as y
     from website_event
     ${joinSession}
