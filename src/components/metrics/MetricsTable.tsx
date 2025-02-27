@@ -93,7 +93,7 @@ export function MetricsTable({
 
   return (
     <div className={classNames(styles.container, className)}>
-      {error && <ErrorMessage />}
+      {error && <ErrorMessage error={error} />}
       <div className={styles.actions}>
         {allowSearch && (
           <SearchField

@@ -17,7 +17,7 @@ export function MetricsBar({ children, isLoading, isFetched, error }: MetricsBar
   return (
     <div className={styles.bar}>
       {isLoading && !isFetched && <Loading icon="dots" />}
-      {error && <ErrorMessage />}
+      {error && <ErrorMessage error={error} />}
       {!isLoading &&
         !error &&
         isFetched &&

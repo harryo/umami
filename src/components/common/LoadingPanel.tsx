@@ -28,7 +28,7 @@ export function LoadingPanel({
   return (
     <div className={classNames(styles.panel, className)}>
       {isLoading && !isFetched && <Loading className={styles.loading} icon={loadingIcon} />}
-      {error && <ErrorMessage />}
+      {error && <ErrorMessage error={error} />}
       {!error && isEmpty && <Empty />}
       {!error && !isEmpty && data && children}
     </div>

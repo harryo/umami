@@ -2,8 +2,10 @@ import { Icon, Icons, Text } from 'react-basics';
 import styles from './ErrorMessage.module.css';
 import { useMessages } from '@/components/hooks';
 
-export function ErrorMessage() {
+export function ErrorMessage({ error }: { error: unknown }) {
   const { formatMessage, messages } = useMessages();
+
+  console.error(error); // eslint-disable-line no-console
 
   return (
     <div className={styles.error}>
