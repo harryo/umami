@@ -105,63 +105,62 @@ export async function GET(
   return badRequest();
 }
 
-function getChannels(data: { domain: string; query: string; visitors: number }[]) {
-  const channels = {
-    direct: 0,
-    referral: 0,
-    affiliate: 0,
-    email: 0,
-    sms: 0,
-    organicSearch: 0,
-    organicSocial: 0,
-    organicShopping: 0,
-    organicVideo: 0,
-    paidAds: 0,
-    paidSearch: 0,
-    paidSocial: 0,
-    paidShopping: 0,
-    paidVideo: 0,
+const match = (value: string) => {
+  return (str: string | RegExp) => {
+    return typeof str === 'string' ? value?.includes(str) : (str as RegExp).test(value);
   };
+};
 
-  const match = (value: string) => {
-    return (str: string | RegExp) => {
-      return typeof str === 'string' ? value?.includes(str) : (str as RegExp).test(value);
-    };
-  };
+function getChannel(domain, query) {
+  if (!domain && !query) {
+    return 'direct';
+  }
+  const prefix = /utm_medium=(.*cp.*|ppc|retargeting|paid.*)/.test(query) ? 'paid' : 'organic';
+
+  if (SEARCH_DOMAINS.some(match(domain)) || /utm_medium=organic/.test(query)) {
+    return `${prefix}Search`;
+  }
+  if (
+    SOCIAL_DOMAINS.some(match(domain)) ||
+    /utm_medium=(social|social-network|social-media|sm|social network|social media)/.test(query)
+  ) {
+    return `${prefix}Social`;
+  }
+  if (EMAIL_DOMAINS.some(match(domain)) || /utm_medium=(.*e[-_ ]?mail.*)/.test(query)) {
+    return 'email';
+  }
+  if (
+    SHOPPING_DOMAINS.some(match(domain)) ||
+    /utm_campaign=(.*(([^a-df-z]|^)shop|shopping).*)/.test(query)
+  ) {
+    return `${prefix}Shopping`;
+  }
+  if (VIDEO_DOMAINS.some(match(domain)) || /utm_medium=(.*video.*)/.test(query)) {
+    return `${prefix}Video`;
+  }
+  if (PAID_AD_PARAMS.some(match(query))) {
+    return 'paidAds';
+  }
+  if (/utm_medium=affiliate/.test(query)) {
+    return 'affiliate';
+  }
+  if (/utm_(source|medium)=sms/.test(query)) {
+    return 'sms';
+  }
+  return 'referral';
+}
+
+function getChannels(data: { domain: string; query: string; visitors: number }[]) {
+  const channels = {};
 
   for (const { domain, query, visitors } of data) {
-    if (!domain && !query) {
-      channels.direct += Number(visitors);
-    }
+    const channel = getChannel(domain, query);
 
-    const prefix = /utm_medium=(.*cp.*|ppc|retargeting|paid.*)/.test(query) ? 'paid' : 'organic';
-
-    if (SEARCH_DOMAINS.some(match(domain)) || /utm_medium=organic/.test(query)) {
-      channels[`${prefix}Search`] += Number(visitors);
-    } else if (
-      SOCIAL_DOMAINS.some(match(domain)) ||
-      /utm_medium=(social|social-network|social-media|sm|social network|social media)/.test(query)
-    ) {
-      channels[`${prefix}Social`] += Number(visitors);
-    } else if (EMAIL_DOMAINS.some(match(domain)) || /utm_medium=(.*e[-_ ]?mail.*)/.test(query)) {
-      channels.email += Number(visitors);
-    } else if (
-      SHOPPING_DOMAINS.some(match(domain)) ||
-      /utm_campaign=(.*(([^a-df-z]|^)shop|shopping).*)/.test(query)
-    ) {
-      channels[`${prefix}Shopping`] += Number(visitors);
-    } else if (VIDEO_DOMAINS.some(match(domain)) || /utm_medium=(.*video.*)/.test(query)) {
-      channels[`${prefix}Video`] += Number(visitors);
-    } else if (PAID_AD_PARAMS.some(match(query))) {
-      channels.paidAds += Number(visitors);
-    } else if (/utm_medium=(referral|app|link)/.test(query)) {
-      channels.referral += Number(visitors);
-    } else if (/utm_medium=affiliate/.test(query)) {
-      channels.affiliate += Number(visitors);
-    } else if (/utm_(source|medium)=sms/.test(query)) {
-      channels.sms += Number(visitors);
-    } else if (domain) {
-      channels.referral += Number(visitors);
+    if (channel) {
+      if (!channels[channel]) {
+        channels[channel] = 0;
+      }
+      channels[channel] += Number(visitors);
     }
   }
 
