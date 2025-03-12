@@ -160,6 +160,8 @@ function getChannels(data: { domain: string; query: string; visitors: number }[]
       channels.affiliate += Number(visitors);
     } else if (/utm_(source|medium)=sms/.test(query)) {
       channels.sms += Number(visitors);
+    } else if (domain) {
+      channels.referral += Number(visitors);
     }
   }
 
