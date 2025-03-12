@@ -81,20 +81,16 @@ export function ReferrersTable({ allowFilter, ...props }: ReferrersTableProps) {
   };
 
   return (
-    <>
-      <MetricsTable
-        {...props}
-        title={formatMessage(labels.referrers)}
-        type="referrer"
-        metric={formatMessage(labels.visitors)}
-        dataFilter={view === 'grouped' ? groupedFilter : undefined}
-        renderLabel={renderLink}
-      >
-        {allowFilter && (
-          <FilterButtons items={buttons} selectedKey={view} onSelect={handleSelect} />
-        )}
-      </MetricsTable>
-    </>
+    <MetricsTable
+      {...props}
+      title={formatMessage(labels.referrers)}
+      type="referrer"
+      metric={formatMessage(labels.visitors)}
+      dataFilter={view === 'grouped' ? groupedFilter : undefined}
+      renderLabel={renderLink}
+    >
+      {allowFilter && <FilterButtons items={buttons} selectedKey={view} onSelect={handleSelect} />}
+    </MetricsTable>
   );
 }
 
