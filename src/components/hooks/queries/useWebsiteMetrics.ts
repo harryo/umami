@@ -12,6 +12,15 @@ export function useWebsiteMetrics(
   const params = useFilterParams(websiteId);
   const searchParams = useSearchParams();
 
+  const allParams = {
+    ...params,
+    ...queryParams,
+  };
+  const view = searchParams.get('view');
+  if (view && view !== 'referrer') {
+    delete allParams[view];
+  }
+
   return useQuery({
     queryKey: [
       'websites:metrics',
@@ -22,11 +31,7 @@ export function useWebsiteMetrics(
       },
     ],
     queryFn: async () => {
-      const data = await get(`/websites/${websiteId}/metrics`, {
-        ...params,
-        [searchParams.get('view')]: undefined,
-        ...queryParams,
-      });
+      const data = await get(`/websites/${websiteId}/metrics`, allParams);
 
       options?.onDataLoad?.(data);
 
