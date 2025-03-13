@@ -1,5 +1,5 @@
 import { CHART_COLORS } from '@/lib/constants';
-import ChartProps from '@/components/charts/Chart';
+import { ChartProps } from '@/components/charts/Chart';
 
 function numericValues(values: { value: string; total: number }[]) {
   if (values.length < 10) {
