@@ -21,9 +21,10 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
     return values?.reduce((sum, { total }) => sum + total, 0) ?? 0;
   }, [values]);
 
-  const chartData = useMemo(() => {
-    propertyName && values ? getChartData(values) : null;
-  }, [propertyName, values]);
+  const chartData = useMemo(
+    () => (propertyName && values ? getChartData(values) : null),
+    [propertyName, values],
+  );
 
   const tableData = useMemo(() => {
     if (!propertyName || !values || propertySum === 0) return [];
@@ -38,6 +39,8 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
     setEventName(row.eventName);
     setPropertyName(row.propertyName);
   };
+
+  const finalPropertyView = chartData?.type === 'line' ? 'line' : propertyView;
 
   return (
     <LoadingPanel isLoading={isLoading} isFetched={isFetched} data={data} error={error}>
@@ -63,23 +66,28 @@ export function EventProperties({ websiteId }: { websiteId: string }) {
           <div className={styles.data}>
             <Flexbox className={styles.header} gap={12} justifyContent="space-between">
               <div className={styles.title}>{`${eventName}: ${propertyName}`}</div>
-              <ButtonGroup
-                selectedKey={propertyView}
-                onSelect={key => setPropertyView(key as string)}
-              >
-                <Button key="table">{formatMessage(labels.table)}</Button>
-                <Button key="chart">{formatMessage(labels.chart)}</Button>
-              </ButtonGroup>
+              {finalPropertyView !== 'line' && (
+                <ButtonGroup
+                  selectedKey={propertyView}
+                  onSelect={key => setPropertyView(key as string)}
+                >
+                  <Button key="table">{formatMessage(labels.table)}</Button>
+                  <Button key="chart">{formatMessage(labels.chart)}</Button>
+                </ButtonGroup>
+              )}
             </Flexbox>
-
             {!values ? (
               <Loading icon="dots" />
-            ) : propertyView === 'table' ? (
-              <ListTable data={tableData} />
-            ) : chartData?.type === 'line' ? (
-              <Chart key={propertyName + eventName} {...chartData} />
             ) : (
-              <PieChart key={propertyName + eventName} {...chartData} />
+              <>
+                {finalPropertyView === 'table' && <ListTable data={tableData} />}
+                {finalPropertyView === 'line' && (
+                  <Chart key={propertyName + eventName} {...chartData} />
+                )}
+                {finalPropertyView === 'chart' && (
+                  <PieChart key={propertyName + eventName} {...chartData} type="pie" />
+                )}
+              </>
             )}
           </div>
         )}
